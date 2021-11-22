@@ -1,19 +1,19 @@
 import tweepy
-
+import os
 
 class TwitterController():
     def __init__(self, twitter_user=None):
         auth = tweepy.OAuthHandler(
-            "JDvtgsgZCbLUtgdTKAhsx6OSV",
-            "cr2tQMQYYbtVP34El92bQZUKXnyMdx6Bjc88x3ZsbKDq46ppTK"
+            os.getenv("TWITTER_AUTH_KEY"),
+            os.getenv("TWITTER_AUTH_SECRET")
             )
         auth.set_access_token(
-            "1413059952298528771-BfKsDMv6rQjqBCyg99beIYtq2ffjwh",
-            "nGxGB3Wwp8soCgxzjfVQxNt9tgpkRJODlB0bp0jGhnllp"
+            os.getenv("TWITTER_ACCESS_KEY"),
+            os.getenv("TWITTER_ACCESS_SECRET")
             )
         self.auth = auth
         self.twitter_controller = tweepy.API(
-            self.auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True
+            self.auth, wait_on_rate_limit=True
             )
         self.twitter_user = twitter_user
 
@@ -30,7 +30,7 @@ class TwitterController():
     def get_following_list(self):
         following_list = []
         for friend in tweepy.Cursor(
-                      self.twitter_controller.friends,
+                      self.twitter_controller.get_friends,
                       id=self.twitter_user
                       ).items(20):
             following_list.append(friend)
@@ -39,7 +39,7 @@ class TwitterController():
     def get_selected_following(self, user):
         following_list = []
         for friend in tweepy.Cursor(
-                      self.twitter_controller.friends, id=user
+                      self.twitter_controller.get_friends, id=user
                       ).items():
             following_list.append(friend)
         return following_list
